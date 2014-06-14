@@ -37,13 +37,27 @@ import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 public class Utils {
 	private static final String LOG_TAG = "Utils";
 	
+	/**
+	 * 获取窗口属性
+	 * @param context
+	 * @return
+	 */
+	public static DisplayMetrics getDisplayMetrics(Context context) {
+		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+		DisplayMetrics dm = new DisplayMetrics();
+		// 取得窗口属性
+		wm.getDefaultDisplay().getMetrics(dm);
+		return dm;
+	}
 	public static boolean isNetWorkExist(Context ctx) {
 		try {
 			ConnectivityManager conManager = (ConnectivityManager) ctx
