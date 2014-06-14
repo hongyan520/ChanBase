@@ -7,14 +7,81 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 import org.apache.http.util.EncodingUtils;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.demo.base.support.BaseConstants;
 
 public class FileUtils
 {
+	
+	/**
+	 * 根据屏幕尺寸大小等比缩放原图
+	 * @param picFilePath 图片全路径
+	 * @return
+	 */
+	public static Bitmap getScaleproBitmapByPIC(String picFilePath,Context context){
+		WindowManager wm = (WindowManager) context
+				.getSystemService(Context.WINDOW_SERVICE);
+		DisplayMetrics dm = new DisplayMetrics();
+		// 取得窗口属性
+		wm.getDefaultDisplay().getMetrics(dm);
+		// 窗口的宽度
+		int screenWidth = dm.widthPixels;
+		// 窗口高度
+		int screenHeight = dm.heightPixels;
+		// 屏幕高宽比例
+		float screenRatio = screenHeight / screenWidth;
+
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		// 获取这个图片的宽和高
+		Bitmap bitmap = BitmapFactory.decodeFile(picFilePath, options); // 此时返回bum为空
+		options.inJustDecodeBounds = false; // 注意这次要把options.inJustDecodeBounds
+											// 设为 false哦
+		// 图片的原始高宽比例
+		float picRatio = options.outHeight / options.outWidth;
+
+		int splashHeight = 0;
+		int splashWidth = 0;
+		if (screenRatio > picRatio) {
+			splashHeight = screenHeight;
+			splashWidth = (int) (splashHeight / picRatio);
+		} else {
+			splashWidth = screenWidth;
+			splashHeight = (int) (splashWidth * picRatio);
+		}
+
+		options.outHeight = splashHeight;
+		options.outWidth = splashWidth;
+		// 重新读入图片
+		InputStream is = null;
+		try {
+			is = new FileInputStream(picFilePath);
+			bitmap = BitmapFactory.decodeStream(is, null, options);// decodeFile(filePath,
+																	// options);
+		} catch (FileNotFoundException e) {
+		} finally {
+			try {
+				if (is != null)
+					is.close();
+			} catch (IOException e) {
+			}
+		}
+
+		if (bitmap == null) {
+			return null;
+		}
+		return bitmap;
+	}
 	
 	/**
 	 * 删除指定目录下的所有文件
