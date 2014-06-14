@@ -11,8 +11,64 @@ import java.io.RandomAccessFile;
 
 import org.apache.http.util.EncodingUtils;
 
+import com.demo.base.support.BaseConstants;
+
 public class FileUtils
 {
+	
+	/**
+	 * 删除指定目录下的所有文件
+	 * @param path
+	 */
+	public static void deleteFilesByPath(String path){
+		deleteFiles(new File(path));
+	}
+	
+	/**
+	 * 递归删除文件和文件夹
+	 * 
+	 * @param file
+	 *            要删除的根目录
+	 */
+	public static void deleteFiles(File file) {
+		if (file.exists() == false) {
+			
+			return;
+		} else {
+			if (file.isFile()) {
+				file.delete();
+				return;
+			}
+			if (file.isDirectory()) {
+				File[] childFile = file.listFiles();
+				if (childFile == null || childFile.length == 0) {
+					file.delete();
+					return;
+				}
+				for (File f : childFile) {
+					deleteFiles(f);
+				}
+				file.delete();
+			}
+		}
+	}
+	
+	/**
+	 * 保存文件内容 并返回文件内容
+	 * @param path
+	 * @param content
+	 * @return
+	 */
+	public static String saveFileContent(String path,String content) {
+		
+		if(!"".equals(content)){
+			createText(path); // 创建文件
+			deleteText(path); // 删除文件内容
+			writeText(content, path);
+		}
+		return readText(path);
+		
+	}
 
 	/**
 	 * 创建Text文件
@@ -41,7 +97,7 @@ public class FileUtils
 	 * 
 	 * @param path
 	 */
-	public void deleteText(String path)
+	public static void deleteText(String path)
 	{
 		try
 		{
@@ -65,6 +121,10 @@ public class FileUtils
 	{
 		FileReader fileread;
 		File filename = new File(path);
+		if (!filename.exists())
+		{
+			return "";
+		}
 		String line = null;
 		try
 		{
@@ -234,7 +294,7 @@ public class FileUtils
 			int length = fin.available();
 			byte[] buffer = new byte[length];
 			fin.read(buffer);
-			res = EncodingUtils.getString(buffer, "UTF-8");
+			res = EncodingUtils.getString(buffer, BaseConstants.CHARSET);
 			fin.close();
 		}
 		catch (Exception e)
