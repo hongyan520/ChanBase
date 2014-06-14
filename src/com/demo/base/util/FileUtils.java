@@ -7,12 +7,135 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 
 import org.apache.http.util.EncodingUtils;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
+
+import com.demo.base.support.BaseConstants;
+
 public class FileUtils
 {
+	
+	/**
+	 * 根据屏幕尺寸大小等比缩放原图
+	 * @param picFilePath 图片全路径
+	 * @return
+	 */
+	public static Bitmap getScaleproBitmapByPIC(String picFilePath,Context context){
+		WindowManager wm = (WindowManager) context
+				.getSystemService(Context.WINDOW_SERVICE);
+		DisplayMetrics dm = new DisplayMetrics();
+		// 取得窗口属性
+		wm.getDefaultDisplay().getMetrics(dm);
+		// 窗口的宽度
+		int screenWidth = dm.widthPixels;
+		// 窗口高度
+		int screenHeight = dm.heightPixels;
+		// 屏幕高宽比例
+		float screenRatio = screenHeight / screenWidth;
+
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		// 获取这个图片的宽和高
+		Bitmap bitmap = BitmapFactory.decodeFile(picFilePath, options); // 此时返回bum为空
+		options.inJustDecodeBounds = false; // 注意这次要把options.inJustDecodeBounds
+											// 设为 false哦
+		// 图片的原始高宽比例
+		float picRatio = options.outHeight / options.outWidth;
+
+		int splashHeight = 0;
+		int splashWidth = 0;
+		if (screenRatio > picRatio) {
+			splashHeight = screenHeight;
+			splashWidth = (int) (splashHeight / picRatio);
+		} else {
+			splashWidth = screenWidth;
+			splashHeight = (int) (splashWidth * picRatio);
+		}
+
+		options.outHeight = splashHeight;
+		options.outWidth = splashWidth;
+		// 重新读入图片
+		InputStream is = null;
+		try {
+			is = new FileInputStream(picFilePath);
+			bitmap = BitmapFactory.decodeStream(is, null, options);// decodeFile(filePath,
+																	// options);
+		} catch (FileNotFoundException e) {
+		} finally {
+			try {
+				if (is != null)
+					is.close();
+			} catch (IOException e) {
+			}
+		}
+
+		if (bitmap == null) {
+			return null;
+		}
+		return bitmap;
+	}
+	
+	/**
+	 * 删除指定目录下的所有文件
+	 * @param path
+	 */
+	public static void deleteFilesByPath(String path){
+		deleteFiles(new File(path));
+	}
+	
+	/**
+	 * 递归删除文件和文件夹
+	 * 
+	 * @param file
+	 *            要删除的根目录
+	 */
+	public static void deleteFiles(File file) {
+		if (file.exists() == false) {
+			
+			return;
+		} else {
+			if (file.isFile()) {
+				file.delete();
+				return;
+			}
+			if (file.isDirectory()) {
+				File[] childFile = file.listFiles();
+				if (childFile == null || childFile.length == 0) {
+					file.delete();
+					return;
+				}
+				for (File f : childFile) {
+					deleteFiles(f);
+				}
+				file.delete();
+			}
+		}
+	}
+	
+	/**
+	 * 保存文件内容 并返回文件内容
+	 * @param path
+	 * @param content
+	 * @return
+	 */
+	public static String saveFileContent(String path,String content) {
+		
+		if(!"".equals(content)){
+			createText(path); // 创建文件
+			deleteText(path); // 删除文件内容
+			writeText(content, path);
+		}
+		return readText(path);
+		
+	}
 
 	/**
 	 * 创建Text文件
@@ -41,7 +164,7 @@ public class FileUtils
 	 * 
 	 * @param path
 	 */
-	public void deleteText(String path)
+	public static void deleteText(String path)
 	{
 		try
 		{
@@ -65,6 +188,10 @@ public class FileUtils
 	{
 		FileReader fileread;
 		File filename = new File(path);
+		if (!filename.exists())
+		{
+			return "";
+		}
 		String line = null;
 		try
 		{
@@ -234,7 +361,7 @@ public class FileUtils
 			int length = fin.available();
 			byte[] buffer = new byte[length];
 			fin.read(buffer);
-			res = EncodingUtils.getString(buffer, "UTF-8");
+			res = EncodingUtils.getString(buffer, BaseConstants.CHARSET);
 			fin.close();
 		}
 		catch (Exception e)
