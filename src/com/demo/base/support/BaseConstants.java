@@ -1,5 +1,7 @@
 package com.demo.base.support;
 
+import android.os.Environment;
+
 public class BaseConstants {
 
 	/**
@@ -36,5 +38,25 @@ public class BaseConstants {
 	 *  编码统一设置Charset
 	 */
 	public final static String CHARSET = "UTF-8";
+	
+	/**
+	 * 设置是否使用缓存 ，项目中设置可在项目string.xml中设置is_use_cache值即可
+	 */
+	public static boolean ISUSECACHE = true;
+	
+	/**
+	 * 缓存根目录 项目中设置可在项目Constant中设置值即可
+	 */
+	public static String BASE_CACHE_PATH = Environment.getExternalStorageDirectory().toString() + "/gixue/";
+	
+	/**
+	 * 静态缓存目录 项目中设置可在项目Constant中设置值即可
+	 */
+	public static String STATIC_PATH = "static/";
+	
+	/**
+	 * API动态缓存目录 项目中设置可在项目Constant中设置值即可
+	 */
+	public static String API_PATH = "Api/";
 	
 }

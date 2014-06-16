@@ -74,7 +74,7 @@ public class HttpSubmitMethodExt {
 			
 			is = con.getInputStream();//发送请求获取输出流
 			
-			if(con.getContentEncoding().contains("gzip")){//使用Gzip
+			if(con.getContentEncoding()!=null && con.getContentEncoding().contains("gzip")){//使用Gzip
 				is = new GZIPInputStream(is);
 			}
 			
@@ -124,6 +124,28 @@ public class HttpSubmitMethodExt {
 	public static synchronized Object postKeyValueData(String urlString,Map<String, String> param) {
 		InputStream is= null;
 		try {
+			// 是否使用缓存
+			if(BaseConstants.ISUSECACHE){
+				// 使用缓存
+				
+				//1，根据urlString和param组装请求url
+				String url = urlString;
+				Set<String> keyset = param.keySet();
+				for(String key : keyset){
+					url += "&"+key+"="+param.get(key);
+				}
+				//2，根据组装url返回转化后的本地缓存路径 GixueUtils.getApiStrConvertToCachePath()
+				String cachePath = CacheSupport.getApiStrConvertToCachePath(url);
+				//3，根据本地缓存路径查找本地缓存内容FileUtils.readText()，并将存在的记录的digest获取后添加到url参数，再继续http请求
+				
+				
+				// 无网络，直接返回缓存内容
+				
+				// 有网络：
+				// 如果返回为空，直接请求
+				
+				// 如果有值找出digest参数添加到请求url中去  （最后如果返回值空，则直接将本地缓存值返回）
+			}
 			
 			HttpPost httpPost = new HttpPost(urlString);
 			
@@ -153,7 +175,7 @@ public class HttpSubmitMethodExt {
 			
 			if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {//正常响应
 				HttpEntity httpEntity = httpResponse.getEntity();
-				if(httpEntity.getContentEncoding().getValue().contains("gzip")){
+				if(httpEntity!=null && httpEntity.getContentEncoding()!=null && httpEntity.getContentEncoding().getValue() != null && httpEntity.getContentEncoding().getValue().contains("gzip")){
 					Log.i(tag, "使用gzip解析数据");
 					// 使用Gzip
 					is = httpEntity.getContent();
@@ -217,7 +239,7 @@ public class HttpSubmitMethodExt {
 			
 			if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {//正常响应
 				HttpEntity httpEntity = httpResponse.getEntity();
-				if(httpEntity.getContentEncoding().getValue().contains("gzip")){
+				if(httpEntity!=null && httpEntity.getContentEncoding()!=null && httpEntity.getContentEncoding().getValue() != null && httpEntity.getContentEncoding().getValue().contains("gzip")){
 					Log.i(tag, "使用gzip解析数据");
 					// 使用Gzip
 					is = httpEntity.getContent();
@@ -344,7 +366,7 @@ public class HttpSubmitMethodExt {
 	//		while ((line = bufReader.readLine()) == null)
 	//			data += line;
 	
-			if(conn.getContentEncoding().contains("gzip")){//使用Gzip
+			if(conn.getContentEncoding() !=null && conn.getContentEncoding().contains("gzip")){//使用Gzip
 				in = new GZIPInputStream(in);
 			}
 			
