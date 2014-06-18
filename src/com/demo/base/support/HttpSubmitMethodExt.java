@@ -170,7 +170,7 @@ public class HttpSubmitMethodExt {
 			httpPost.setEntity(new UrlEncodedFormEntity(params,BaseConstants.CHARSET));
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			//设置请求超时时间为 3s
-			httpClient.getParams().setIntParameter("http.socket.timeout",3000);  
+			httpClient.getParams().setIntParameter("http.socket.timeout",10000);  
 			
 			// 取得HTTP response
 			HttpResponse httpResponse = httpClient.execute(httpPost);

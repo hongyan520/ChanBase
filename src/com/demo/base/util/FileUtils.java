@@ -1,5 +1,6 @@
 package com.demo.base.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 
 import org.apache.http.util.EncodingUtils;
@@ -189,7 +191,7 @@ public class FileUtils
 		if(path == null){
 			return "";
 		}
-		FileReader fileread;
+		//FileReader fileread;
 		File filename = new File(path);
 		if (!filename.exists())
 		{
@@ -198,11 +200,14 @@ public class FileUtils
 		String line = null;
 		try
 		{
-			fileread = new FileReader(filename);
-			BufferedReader bfr = new BufferedReader(fileread);
+			FileInputStream fis = new FileInputStream(path);       
+			BufferedInputStream in = new BufferedInputStream(fis);
+			//fileread = new FileReader(filename);
+			BufferedReader bfr = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			try
 			{
 				line = bfr.readLine();
+				bfr.close();
 			}
 			catch (IOException e)
 			{
@@ -214,7 +219,9 @@ public class FileUtils
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}catch (IOException e) {  
+			e.printStackTrace(); 
+		}  
 
 		return line;
 	}// end method readText()
@@ -234,7 +241,7 @@ public class FileUtils
 		try
 		{
 			mm = new RandomAccessFile(filename, "rw");
-			mm.writeBytes(content);
+			mm.write(content.getBytes("UTF-8"));
 		}
 		catch (IOException e1)
 		{
