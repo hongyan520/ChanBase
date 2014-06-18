@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.text.DecimalFormat;
 
 import org.apache.http.util.EncodingUtils;
 
@@ -120,6 +121,57 @@ public class FileUtils
 				file.delete();
 			}
 		}
+	}
+	
+	/**
+	 * 返回指定目录或文件的所占用大小
+	 * @param path
+	 * @return
+	 */
+	public static String calculatePathSize(String path){
+		File file = new File(path);
+		try {
+			return FormetFileSize(getFileSize(file));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "0";
+	}
+	
+	public static long getFileSize(File f) throws Exception {
+		if (!f.exists()) {
+			return 0;
+		}
+
+		if (f.isFile()) {
+			return f.length();
+		}
+		long size = 0;
+		File flist[] = f.listFiles();
+		for (int i = 0; i < flist.length; i++) {
+			if (flist[i].isDirectory()) {
+				size = size + getFileSize(flist[i]);
+			} else {
+				size = size + flist[i].length();
+			}
+		}
+		return size;
+	}
+
+	public static String FormetFileSize(long fileS) {// 转换文件大小
+		DecimalFormat df = new DecimalFormat("#.00");
+		String fileSizeString = "";
+		if (fileS < 1024) {
+			fileSizeString = df.format((double) fileS) + "B";
+		} else if (fileS < 1048576) {
+			fileSizeString = df.format((double) fileS / 1024) + "K";
+		} else if (fileS < 1073741824) {
+			fileSizeString = df.format((double) fileS / 1048576) + "M";
+		} else {
+			fileSizeString = df.format((double) fileS / 1073741824) + "G";
+		}
+		return fileSizeString;
 	}
 	
 	/**
