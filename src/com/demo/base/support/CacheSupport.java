@@ -1,5 +1,10 @@
 package com.demo.base.support;
 
+import java.util.Map;
+import java.util.Set;
+
+import com.demo.base.util.FileUtils;
+
 public abstract class CacheSupport {
 
 
@@ -30,6 +35,35 @@ public abstract class CacheSupport {
 		if("".equals(apiStr)){
 			return "";
 		}
-		return BaseConstants.BASE_CACHE_PATH+ BaseConstants.API_PATH + apiStr.replaceAll("[?,=,&]", "-");
+		return BaseConstants.BASE_CACHE_PATH+ BaseConstants.API_PATH + apiStr.replaceAll("http://", "").replaceAll("[?,=,&,.]", "-")+BaseConstants.API_FILE_SUFFIX;
+	}
+	
+	/**
+	 * 根据url和参数获取本地缓存路径
+	 * @param urlString
+	 * @param param
+	 * @return
+	 */
+	public static String getApiCachePathByUrlAndParam(String urlString,Map<String, String> param){
+		//1，根据urlString和param组装请求url
+		String url = urlString;
+		Set<String> keyset = param.keySet();
+		for(String key : keyset){
+			url += "&"+key+"="+param.get(key);
+		}
+		//2，根据组装url返回转化后的本地缓存路径 GixueUtils.getApiStrConvertToCachePath()
+		return  getApiStrConvertToCachePath(url);
+	}
+	
+	/**
+	 * 根据传入url和参数获取缓存内容
+	 * @param urlString 请求api的url
+	 * @param param 请求的参数封装Map（keyValue）
+	 * @return
+	 */
+	public static String getApiCacheContentByUrlAndParam(String urlString,Map<String, String> param){
+		// 根据本地缓存路径查找本地缓存内容FileUtils.readText()
+		String cacheContent = FileUtils.readText(getApiCachePathByUrlAndParam(urlString, param));
+		return cacheContent;
 	}
 }

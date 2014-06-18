@@ -28,6 +28,8 @@ import org.apache.http.util.EntityUtils;
 
 import android.util.Log;
 
+import com.demo.base.util.FileUtils;
+import com.demo.base.util.JsonUtil;
 import com.demo.base.util.StringUtil;
 
 public class HttpSubmitMethodExt {
@@ -124,27 +126,21 @@ public class HttpSubmitMethodExt {
 	public static synchronized Object postKeyValueData(String urlString,Map<String, String> param) {
 		InputStream is= null;
 		try {
+			String digestStr = "";
+			String cachePath = "";
 			// 是否使用缓存
 			if(BaseConstants.ISUSECACHE){
 				// 使用缓存
 				
-				//1，根据urlString和param组装请求url
-				String url = urlString;
-				Set<String> keyset = param.keySet();
-				for(String key : keyset){
-					url += "&"+key+"="+param.get(key);
+				//，根据本地缓存路径查找本地缓存内容FileUtils.readText()，并将存在的记录的digest获取后添加到url参数，再继续http请求
+				cachePath = CacheSupport.getApiCachePathByUrlAndParam(urlString, param);
+				String cacheContent = FileUtils.readText(cachePath);
+				if(!StringUtil.isBlank(cacheContent)){
+					Map<String,Object> cacheMap = JsonUtil.getMap(cacheContent);
+					if(cacheMap != null && cacheMap.size() > 0){
+						digestStr = StringUtil.Object2String(cacheMap.get("Digest"));
+					}
 				}
-				//2，根据组装url返回转化后的本地缓存路径 GixueUtils.getApiStrConvertToCachePath()
-				String cachePath = CacheSupport.getApiStrConvertToCachePath(url);
-				//3，根据本地缓存路径查找本地缓存内容FileUtils.readText()，并将存在的记录的digest获取后添加到url参数，再继续http请求
-				
-				
-				// 无网络，直接返回缓存内容
-				
-				// 有网络：
-				// 如果返回为空，直接请求
-				
-				// 如果有值找出digest参数添加到请求url中去  （最后如果返回值空，则直接将本地缓存值返回）
 			}
 			
 			HttpPost httpPost = new HttpPost(urlString);
@@ -164,6 +160,11 @@ public class HttpSubmitMethodExt {
 			for(String key : keyset){
 				params.add(new BasicNameValuePair(key,param.get(key)));
 			}
+			if(!StringUtil.isBlank(digestStr)){
+				// Digest不为空时拼接参数
+				params.add(new BasicNameValuePair("Digest",digestStr));
+			}
+			
 			// 发出HTTP请求
 			httpPost.setEntity(new UrlEncodedFormEntity(params,BaseConstants.CHARSET));
 			DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -175,6 +176,7 @@ public class HttpSubmitMethodExt {
 			
 			if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {//正常响应
 				HttpEntity httpEntity = httpResponse.getEntity();
+				String returnContent = "";
 				if(httpEntity!=null && httpEntity.getContentEncoding()!=null && httpEntity.getContentEncoding().getValue() != null && httpEntity.getContentEncoding().getValue().contains("gzip")){
 					Log.i(tag, "使用gzip解析数据");
 					// 使用Gzip
@@ -187,11 +189,16 @@ public class HttpSubmitMethodExt {
 					while ((line = bufferedReader.readLine()) != null) {
 						sb.append(line);
 					}
-					return sb.toString();
+					returnContent = sb.toString();
 				}else{
 					// 返回响应字串
-					return EntityUtils.toString(httpEntity);	
+					returnContent = EntityUtils.toString(httpEntity);
 				}
+				// 是否使用缓存
+				if(BaseConstants.ISUSECACHE){
+					FileUtils.saveFileContent(cachePath, returnContent);// 存入本地缓存
+				}
+				return returnContent;	
 				
 			} else {
 				throw new Exception("http请求响应不正确，响应值为"+httpResponse.getStatusLine().getStatusCode());

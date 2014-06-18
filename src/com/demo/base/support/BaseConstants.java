@@ -59,4 +59,9 @@ public class BaseConstants {
 	 */
 	public static String API_PATH = "Api/";
 	
+	/**
+	 * 后缀 API动态缓存目录 项目中设置可在项目Constant中设置值即可
+	 */
+	public static String API_FILE_SUFFIX=".gixue";
+	
 }

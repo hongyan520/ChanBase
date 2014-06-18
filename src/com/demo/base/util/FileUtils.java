@@ -126,15 +126,15 @@ public class FileUtils
 	 * @param content
 	 * @return
 	 */
-	public static String saveFileContent(String path,String content) {
+	public static boolean saveFileContent(String path,String content) {
 		
 		if(!"".equals(content)){
+			makeRootDirectory(path.substring(0, path.lastIndexOf("/")+1));
 			createText(path); // 创建文件
 			deleteText(path); // 删除文件内容
 			writeText(content, path);
 		}
-		return readText(path);
-		
+		return true;
 	}
 
 	/**
@@ -186,6 +186,9 @@ public class FileUtils
 	 */
 	public static String readText(String path)
 	{
+		if(path == null){
+			return "";
+		}
 		FileReader fileread;
 		File filename = new File(path);
 		if (!filename.exists())
@@ -224,6 +227,7 @@ public class FileUtils
 	 */
 	public static void writeText(String content, String path)
 	{
+		System.out.println("写入文件"+path);
 		// 先读取原有文件内容，然后进行写入操作
 		RandomAccessFile mm = null;
 		File filename = new File(path);
@@ -278,7 +282,7 @@ public class FileUtils
 			file = new File(filePath);
 			if (!file.exists())
 			{
-				file.mkdir();
+				file.mkdirs();
 			}
 		}
 		catch (Exception e)
