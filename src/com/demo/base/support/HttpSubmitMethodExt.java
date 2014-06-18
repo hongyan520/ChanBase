@@ -128,13 +128,14 @@ public class HttpSubmitMethodExt {
 		try {
 			String digestStr = "";
 			String cachePath = "";
+			String cacheContent = "";
 			// 是否使用缓存
 			if(BaseConstants.ISUSECACHE){
 				// 使用缓存
 				
 				//，根据本地缓存路径查找本地缓存内容FileUtils.readText()，并将存在的记录的digest获取后添加到url参数，再继续http请求
 				cachePath = CacheSupport.getApiCachePathByUrlAndParam(urlString, param);
-				String cacheContent = FileUtils.readText(cachePath);
+				cacheContent = FileUtils.readText(cachePath);
 				if(!StringUtil.isBlank(cacheContent)){
 					Map<String,Object> cacheMap = JsonUtil.getMap(cacheContent);
 					if(cacheMap != null && cacheMap.size() > 0){
@@ -197,6 +198,10 @@ public class HttpSubmitMethodExt {
 				// 是否使用缓存
 				if(BaseConstants.ISUSECACHE){
 					FileUtils.saveFileContent(cachePath, returnContent);// 存入本地缓存
+				}
+				if(!StringUtil.isBlank(digestStr) && !StringUtil.isBlank(cacheContent)){
+					// 存在digest并返回数据为空时，表示服务器数据无变化，则返回本地缓存数据
+					return cacheContent;
 				}
 				return returnContent;	
 				
