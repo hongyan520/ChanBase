@@ -18,6 +18,8 @@ import org.apache.http.util.EncodingUtils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -25,6 +27,34 @@ import com.demo.base.support.BaseConstants;
 
 public class FileUtils
 {
+	
+	/**
+	 * 根据img路径返回Drawable
+	 * @param imgPath
+	 * @param context
+	 * @return
+	 */
+	public static Drawable imgPathToDrawable(String imgPath,Context context,int setwh, int setht){
+		InputStream is = null;
+		Bitmap bitmap = null;
+		try {
+			is = new FileInputStream(imgPath);
+			bitmap = BitmapFactory.decodeStream(is);
+			Drawable bd = BitmapUtils.scaleBitmap(bitmap, setwh, setht);
+			//BitmapDrawable bd= new BitmapDrawable(context.getResources(), bitmap); 
+			return bd;
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally {
+			try {
+				if (is != null)
+					is.close();
+			} catch (IOException e) {
+			}
+		}
+
+		return null;
+	}
 	
 	/**
 	 * 根据屏幕尺寸大小等比缩放原图

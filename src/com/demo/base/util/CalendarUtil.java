@@ -1,5 +1,6 @@
 package com.demo.base.util;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -268,5 +269,14 @@ public class CalendarUtil {
 		return calendar.get(Calendar.YEAR)+"-"+(calendar.get(Calendar.MONTH)+1)+"-"+calendar.get(Calendar.DAY_OF_MONTH);
 	}
 	
-
+	/**
+	 * 根据毫秒转化为时间格式
+	 * @param ms 毫秒数
+	 * @param formatStr 格式
+	 * @return
+	 */
+	public static String getDateFormatByMs(long ms, String formatStr){
+		SimpleDateFormat formatter = new SimpleDateFormat(formatStr);//初始化Formatter的转换格式。
+		return formatter.format(ms);
+	}
 }

@@ -196,10 +196,10 @@ public class HttpSubmitMethodExt {
 					returnContent = EntityUtils.toString(httpEntity);
 				}
 				// 是否使用缓存
-				if(BaseConstants.ISUSECACHE){
+				if(BaseConstants.ISUSECACHE && !"{}".equals(returnContent)){
 					FileUtils.saveFileContent(cachePath, returnContent);// 存入本地缓存
 				}
-				if(!StringUtil.isBlank(digestStr) && !StringUtil.isBlank(cacheContent)){
+				if(!StringUtil.isBlank(digestStr) && !StringUtil.isBlank(cacheContent) && "{}".equals(returnContent)){
 					// 存在digest并返回数据为空时，表示服务器数据无变化，则返回本地缓存数据
 					return cacheContent;
 				}
