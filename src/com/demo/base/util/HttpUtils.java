@@ -37,7 +37,7 @@ public class HttpUtils {
 				input = conn.getInputStream();
 				String dir = localUrl.substring(0,
 						localUrl.lastIndexOf("/") + 1);
-				new File(dir).mkdir();// 新建文件夹
+				new File(dir).mkdirs();// 新建文件夹
 				file.createNewFile();// 新建文件
 				output = new FileOutputStream(file);
 				// 读取大文件

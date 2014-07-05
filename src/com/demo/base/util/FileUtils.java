@@ -119,9 +119,10 @@ public class FileUtils
 	/**
 	 * 删除指定目录下的所有文件
 	 * @param path
+	 * @param isDeleteRootDir 是否删除根目录文件夹
 	 */
-	public static void deleteFilesByPath(String path){
-		deleteFiles(new File(path));
+	public static void deleteFilesByPath(String path,boolean isDeleteRootDir){
+		deleteFiles(new File(path),isDeleteRootDir);
 	}
 	
 	/**
@@ -130,7 +131,7 @@ public class FileUtils
 	 * @param file
 	 *            要删除的根目录
 	 */
-	public static void deleteFiles(File file) {
+	public static void deleteFiles(File file,boolean isDeleteRootDir) {
 		if (file.exists() == false) {
 			
 			return;
@@ -146,9 +147,11 @@ public class FileUtils
 					return;
 				}
 				for (File f : childFile) {
-					deleteFiles(f);
+					deleteFiles(f,isDeleteRootDir);
 				}
-				file.delete();
+				if(isDeleteRootDir){
+					file.delete();
+				}
 			}
 		}
 	}
@@ -190,6 +193,9 @@ public class FileUtils
 	}
 
 	public static String FormetFileSize(long fileS) {// 转换文件大小
+		if(fileS == 0){
+			return "0B";
+		}
 		DecimalFormat df = new DecimalFormat("#.00");
 		String fileSizeString = "";
 		if (fileS < 1024) {
