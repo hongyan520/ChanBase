@@ -345,8 +345,9 @@ public class HttpSubmitMethodExt {
 					sb1.append(PREFIX);
 					sb1.append(BOUNDARY);
 					sb1.append(LINEND);
-					sb1.append("Content-Disposition: form-data; name=\"file\"; filename=\""
-									+ file.getKey() + "\"" + LINEND);
+					File f = files.get(file.getKey());
+					sb1.append("Content-Disposition: form-data; name=\""+file.getKey()+"\"; filename=\""
+									+ f.getName() + "\"" + LINEND);
 					sb1.append("Content-Type: application/octet-stream; charset="
 							+ BaseConstants.CHARSET + LINEND);
 					sb1.append(LINEND);

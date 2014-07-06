@@ -28,6 +28,25 @@ import com.demo.base.support.BaseConstants;
 public class FileUtils
 {
 	
+	public static Bitmap getBitmapByimgPath(String imgPath){
+		InputStream is = null;
+		Bitmap bitmap = null;
+		try {
+			is = new FileInputStream(imgPath);
+			bitmap = BitmapFactory.decodeStream(is);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally {
+			try {
+				if (is != null)
+					is.close();
+			} catch (IOException e) {
+			}
+		}
+		
+		return bitmap;
+	}
+	
 	/**
 	 * 根据img路径返回Drawable
 	 * @param imgPath
@@ -40,6 +59,12 @@ public class FileUtils
 		try {
 			is = new FileInputStream(imgPath);
 			bitmap = BitmapFactory.decodeStream(is);
+			if(setwh == 0){
+				setwh = bitmap.getWidth();
+			}
+			if(setht == 0){
+				setht = bitmap.getHeight();
+			}
 			Drawable bd = BitmapUtils.scaleBitmap(bitmap, setwh, setht);
 			//BitmapDrawable bd= new BitmapDrawable(context.getResources(), bitmap); 
 			return bd;

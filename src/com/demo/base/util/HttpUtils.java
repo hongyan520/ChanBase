@@ -6,7 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
 
@@ -31,21 +37,42 @@ public class HttpUtils {
 				Log.i(tag, localUrl + "is exist");
 				return true;
 			} else {
-				URL url = new URL(serverUrl);
-				conn = (HttpURLConnection) url
-						.openConnection();
-				input = conn.getInputStream();
-				String dir = localUrl.substring(0,
-						localUrl.lastIndexOf("/") + 1);
-				new File(dir).mkdirs();// 新建文件夹
-				file.createNewFile();// 新建文件
-				output = new FileOutputStream(file);
-				// 读取大文件
-				byte[] buffer = new byte[4 * 1024];
-				while (input.read(buffer) != -1) {
-					output.write(buffer);
-				}
-				output.flush();
+				
+				//httpGet连接对象  
+		        HttpGet httpRequest = new HttpGet(serverUrl);
+		      //取得HttpClient 对象  
+		        HttpClient httpclient = new DefaultHttpClient();  
+		      //请求httpClient ，取得HttpRestponse  
+	            HttpResponse httpResponse = httpclient.execute(httpRequest);  
+	            if(httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK){  
+	                //取得相关信息 取得HttpEntiy  
+	                HttpEntity httpEntity = httpResponse.getEntity();  
+	                //获得一个输入流  
+	                input = httpEntity.getContent();  
+	                String dir = localUrl.substring(0,
+							localUrl.lastIndexOf("/") + 1);
+					new File(dir).mkdirs();// 新建文件夹
+					file.createNewFile();// 新建文件
+					output = new FileOutputStream(file);
+					byte[] buffer = new byte[1024];
+	                int len = 0;
+	                while ((len = input.read(buffer)) != -1) {
+	                	output.write(buffer, 0, len);
+	                }
+					
+					// 读取大文件
+//					byte[] buffer = new byte[4 * 1024];
+//					while (input.read(buffer) != -1) {
+//						output.write(buffer);
+//					}
+//					output.flush();
+	            }
+				
+//				URL url = new URL(serverUrl);
+//				conn = (HttpURLConnection) url
+//						.openConnection();
+//				input = conn.getInputStream();
+				
 			}
 			Log.i(tag, localUrl + "download success");
 		} catch (Exception e) {
@@ -53,12 +80,6 @@ public class HttpUtils {
 			Log.i(tag, localUrl + "download fail");
 			return false;
 		} finally {
-			try {
-				if(output != null)
-					output.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 			if(input != null){
 				try {
 					input.close();
@@ -66,6 +87,12 @@ public class HttpUtils {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+			try {
+				if(output != null)
+					output.close();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 			if(conn != null){
 				conn.disconnect();
