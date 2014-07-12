@@ -65,7 +65,7 @@ public class HttpUtils {
 //					while (input.read(buffer) != -1) {
 //						output.write(buffer);
 //					}
-//					output.flush();
+					output.flush();
 	            }
 				
 //				URL url = new URL(serverUrl);
