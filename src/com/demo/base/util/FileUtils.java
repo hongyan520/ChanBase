@@ -21,12 +21,21 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 
 import com.demo.base.support.BaseConstants;
 
 public class FileUtils
 {
+	
+	public static boolean isExisitFile(String path){
+		File file = new File(path);
+		if (file.exists()) {
+			return true;
+		}
+		return false;
+	}
 	
 	public static Bitmap getBitmapByimgPath(String imgPath){
 		InputStream is = null;

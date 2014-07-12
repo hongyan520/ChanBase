@@ -14,7 +14,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 public class HttpUtils {
 
@@ -100,5 +104,6 @@ public class HttpUtils {
 		}
 		return true;
 	}
+	
 	
 }
