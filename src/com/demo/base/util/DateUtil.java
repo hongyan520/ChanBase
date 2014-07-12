@@ -966,4 +966,39 @@ public class DateUtil
 		}
 		return 3;
 	}
+	
+	/**
+	 * 2014年4月20日 12:34
+	 * @param datetimeString
+	 * @return
+	 */
+	public static String getChinaDateByDateString(String datetimeString)
+	{
+		String dtstr = "";
+		SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		try
+		{
+			Date datetime = ft.parse(datetimeString);
+			dtstr += (datetime.getYear() + 1900) + "年";
+			dtstr += (datetime.getMonth() + 1) + "月";
+			dtstr += datetime.getDate() + "日 ";
+			int hour = datetime.getHours();
+			int minute = datetime.getMinutes();
+			String minuteStr = "";
+			if (minute < 10)
+			{
+				minuteStr = "0" + minute;
+			}
+			else
+			{
+				minuteStr = minute + "";
+			}
+			dtstr += hour + ":" + minuteStr;
+		}
+		catch (Exception e)
+		{
+			Log.e("getChinaDateStringByDateString", "获取中文格式时间异常" + e.getMessage());
+		}
+		return dtstr;
+	}
 }
